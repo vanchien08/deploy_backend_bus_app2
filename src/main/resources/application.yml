@@ -5,9 +5,9 @@ server:
 
 spring:
   datasource:
-    url: "jdbc:mysql://localhost:3306/busbooking"
+    url: "jdbc:mysql://root:RyymeFSAsWAAMlECNUYlmuocXxvaymWo@shinkansen.proxy.rlwy.net:55341/railway"
     username: root
-    password:
+    password: RyymeFSAsWAAMlECNUYlmuocXxvaymWo
   jpa:
     hibernate:
       ddl-auto: update
