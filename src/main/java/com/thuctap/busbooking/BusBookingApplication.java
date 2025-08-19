@@ -17,8 +17,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class BusBookingApplication {
     public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.configure().directory(".").load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
+        Dotenv dotenv = Dotenv.configure()
+                .directory(".")
+                .ignoreIfMissing()   // 👈 không ném lỗi nếu thiếu file .env
+                .load();
+
+        dotenv.entries().forEach(entry ->
+                System.setProperty(entry.getKey(), entry.getValue())
+        );
+
         SpringApplication.run(BusBookingApplication.class, args);
     }
 }

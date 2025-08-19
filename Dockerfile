@@ -16,3 +16,5 @@ EXPOSE 8080
 
 # Chạy JAR
 ENTRYPOINT ["java", "-jar", "app.jar"]
+
+COPY .env .env
