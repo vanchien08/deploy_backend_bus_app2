@@ -9,7 +9,10 @@ RUN mvn clean package -DskipTests
 FROM openjdk:21-jdk-slim
 WORKDIR /app
 
-COPY --from=build /app/target/BusBooking-0.0.1-SNAPSHOT.jar BusBooking.jar
+# Copy JAR đã build sang image (dùng wildcard để tránh lỗi version)
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "BusBooking.war"]
+# Chạy JAR
+ENTRYPOINT ["java", "-jar", "app.jar"]
