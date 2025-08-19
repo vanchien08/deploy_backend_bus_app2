@@ -1,0 +1,146 @@
+package com.thuctap.busbooking.controller;
+
+
+import com.cloudinary.Api;
+import com.thuctap.busbooking.dto.request.*;
+import com.thuctap.busbooking.dto.response.ApiResponse;
+import com.thuctap.busbooking.dto.response.InvoiceConsultResponse;
+import com.thuctap.busbooking.dto.response.TicketConsultResponse;
+import com.thuctap.busbooking.entity.Invoice;
+import com.thuctap.busbooking.entity.Ticket;
+import com.thuctap.busbooking.entity.User;
+import com.thuctap.busbooking.repository.TicketRepository;
+import com.thuctap.busbooking.service.auth.InvoiceService;
+import com.thuctap.busbooking.service.auth.SeatPositionService;
+import com.thuctap.busbooking.service.auth.TicketService;
+import com.thuctap.busbooking.service.impl.InvoiceServiceImpl;
+import com.thuctap.busbooking.service.impl.UserServiceImpl;
+import org.springframework.web.bind.annotation.*;
+
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@RestController
+@RequiredArgsConstructor
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequestMapping("/admin")
+public class InvoiceController {
+
+    InvoiceService invoiceService;
+    SeatPositionService seatPositionService;
+    TicketService ticketService;
+
+    @GetMapping("/list-invoice")
+    ApiResponse<List<Invoice>> getAllInvoices() {
+        return ApiResponse.<List<Invoice>>builder()
+                .result(invoiceService.getAllInvoices())
+                .message("Lấy danh sách hoá đơn thành công")
+                .build();
+    }
+
+    @PostMapping("/create-invoice")
+    ApiResponse createInvoice(@RequestBody InvoiceCreationRequest request){
+        Invoice invoice = invoiceService.createInvoice(request);
+        return ApiResponse.builder()
+                .result(invoice.getId())
+                .build();
+    }
+
+    @GetMapping("/get-invoice-by-userid")
+    public ApiResponse<List<Invoice>> getInvoiceByUserId(@RequestParam int id) {
+        return ApiResponse.<List<Invoice>>builder()
+                .result(invoiceService.getInvoiceByUserId(id))
+                .message("Lấy danh sách hóa đơn thành công")
+                .build();
+    }
+
+    @GetMapping("/get-invoice-by-id/{id}")
+    public ApiResponse<List<Ticket>> getInvoiceById(@PathVariable int id) {
+        return ApiResponse.<List<Ticket>>builder()
+                .result(ticketService.getAllTicketsID(id))
+                .build();
+    }
+
+    @PutMapping("/invoices/{id}")
+    public ApiResponse<?> updateInvoice(@PathVariable int id, @RequestBody InvoiceUpdateRequest request) {
+            Invoice updatedInvoice = invoiceService.updateInvoice(id, request);
+            return ApiResponse.builder()
+                    .result("Cập nhật hóa đơn thành công")
+                    .build();
+
+    }
+
+    @PostMapping("/invoices/filter")
+    public ApiResponse<List<Invoice>> filterInvoices(@RequestBody InvoiceFilterRequest filter) {
+        List<Invoice> invoices = invoiceService.filterInvoices(filter);
+        return ApiResponse.<List<Invoice>>builder()
+                .message("Lọc danh sách invoice !")
+                .result(invoices)
+                .build();
+    }
+
+
+
+    @PutMapping("/update-invoice-status")
+    public ApiResponse<Boolean> updateInvoice(@RequestParam Integer id, @RequestParam Integer status) {
+        return ApiResponse.<Boolean>builder()
+                .result(invoiceService.updateInvoiceStatus(id, status))
+                .message("Cập nhật trạng thái bến xe thành công")
+                .build();
+    }
+
+    @PostMapping("/add-bank-detail")
+    ApiResponse createbankdetail(@RequestBody BankDetailRequest request) {
+
+        Boolean result = invoiceService.addBankDetail(request);
+        return ApiResponse.<Boolean>builder()
+                .result(result)
+                .message("Thêm thông tin tài khoản ngân hàng thành công")
+                .build();
+    }
+    @PutMapping("/mark-invoice-paid/{invoiceId}")
+    public ApiResponse markInvoiceAsPaid(@PathVariable Integer invoiceId) {
+        invoiceService.updateInvoiceStatus(invoiceId, 2);
+        return ApiResponse.builder()
+                .message("Cập nhật trạng thái hóa đơn đã thanh toán thành công")
+                .build();
+    }
+
+    @PutMapping("/mark-invoice-expired")
+    public ApiResponse markInvoiceAsExpired(@RequestBody ExpireInvoiceRequest request) {
+        invoiceService.updateInvoiceStatus(request.getInvoiceId(), 0);
+
+        ticketService.updateTicketStatusByInvoiceId(request.getInvoiceId(), 0);
+
+        return ApiResponse.builder()
+                .message("Cập nhật trạng thái hóa đơn hết hạn và ghế thành công")
+
+                .build();
+    }
+
+
+    @PostMapping("/consultInvoice")
+    ApiResponse<InvoiceConsultResponse> getInvoiceConsult(@RequestBody InvoiceConsultRequest request){
+        InvoiceConsultResponse invoiceConsultResponse = invoiceService.getInvoiceConsult(request);
+
+        return ApiResponse.<InvoiceConsultResponse>builder()
+                .result(invoiceConsultResponse)
+                .build();
+    }
+
+//    @GetMapping("/get-bank-by-user-id")
+//    public ApiResponse<List<Invoice>> getInvoiceByUserId(@RequestParam int id) {
+//        return ApiResponse.<List<Invoice>>builder()
+//                .result(invoiceService.getInvoiceByUserId(id))
+//                .message("Lấy danh sách hóa đơn thành công")
+//                .build();
+//    }
+}
