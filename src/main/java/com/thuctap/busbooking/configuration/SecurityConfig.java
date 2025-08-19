@@ -82,6 +82,7 @@ public class SecurityConfig {
 
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.addAllowedOrigin("http://localhost:3000");
+		 corsConfiguration.addAllowedOrigin("https://busappfrontendcom.vercel.app/");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);
