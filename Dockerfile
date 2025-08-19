@@ -9,7 +9,7 @@ RUN mvn clean package -DskipTests
 FROM openjdk:21-jdk-slim
 WORKDIR /app
 
-COPY --from=build /app/target/BusBooking-0.0.1-SNAPSHOT.war BusBooking.war
+COPY --from=build /app/target/BusBooking-0.0.1-SNAPSHOT.jar BusBooking.jar
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "BusBooking.war"]
